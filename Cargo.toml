@@ -1,0 +1,10 @@
+[package]
+name = "crypto-tools"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ark-bn254 = { git = "https://github.com/arkworks-rs/algebra/", branch = "master"}
+ark-ff = { git = "https://github.com/arkworks-rs/algebra/", branch = "master"}
+ark-std = { git = "https://github.com/arkworks-rs/std", branch = "master"}
+ark-starkcurve = { git = "https://github.com/arkworks-rs/algebra/", branch = "master"}
