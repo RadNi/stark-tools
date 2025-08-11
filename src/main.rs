@@ -9,7 +9,7 @@ use ark_starkcurve::{Fq as F, FqConfig as Config};
 // to easily support `std` and `no_std` workloads, and also re-exports
 // useful crates that should be common across the entire ecosystem, such as `rand`.
 use ark_std::{One, UniformRand};
-use crypto_tools::Polynomial;
+use crypto_tools::{Foldable2, Polynomial, PolynomialCoefficient};
 
 
 fn main() {
@@ -46,10 +46,12 @@ fn main() {
     //     vec![(one, BigInt([4, 0, 0, 0]))]);
     let second = F::get_root_of_unity(2).unwrap();
     println!("second root: {second}");
-    let mut p = Polynomial::<Config, 4>::random_poly_coefficient(&mut rng, 2);
+    let p = PolynomialCoefficient::<Config, 4>::random_poly(&mut rng, 3);
     println!("{p}");
-    let p2 = p.fft().unwrap();
-    println!("{p2}");
+    let p2 = p.fft(1);
+    println!("FFT {p2}");
+    let f = p2.fold(1, F::ONE.double());
+    println!("Folded {f}");
     // let poly: Polynomial<Config, 4> = Polynomial::random_poly_fft(&mut rng, 1<<20);
     // print!("{poly}");
 }
