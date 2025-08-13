@@ -1,10 +1,17 @@
 [package]
-name = "crypto-tools"
+name = "stark-tools"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 ark-bn254 = { git = "https://github.com/arkworks-rs/algebra/", branch = "master"}
 ark-ff = { git = "https://github.com/arkworks-rs/algebra/", branch = "master"}
+# ark-ff = { version = "^0.5.0"}
 ark-std = { git = "https://github.com/arkworks-rs/std", branch = "master"}
 ark-starkcurve = { git = "https://github.com/arkworks-rs/algebra/", branch = "master"}
+# ark-crypto-primitives = { version = "^0.5.0", default-features = true, features = [ "r1cs", "crh", "merkle_tree" ] }
+ark-crypto-primitives = { git = "https://github.com/arkworks-rs/crypto-primitives/", branch = "main", default-features = true, features = [ "crh", "merkle_tree" ] }
+# ark-ed-on-bls12-381 = { version = "^0.5.0", features = ["r1cs"] }
+ark-ed-on-bls12-381 = { version = "^0.5.0", features = ["r1cs"] }
+bimap = "0.6.3"
+

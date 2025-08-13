@@ -1,16 +1,6 @@
-use std::str::FromStr;
-
-use ark_ff::{AdditiveGroup, BigInt, FftField, Field, PrimeField};
-// We'll use a field associated with the BLS12-381 pairing-friendly
-// group for this example.
-// use ark_bn254::{Fq as F, FqConfig as Config};
+use ark_ff::{AdditiveGroup, FftField, Field, PrimeField};
 use ark_starkcurve::{Fq as F, FqConfig as Config};
-// `ark-std` is a utility crate that enables `arkworks` libraries
-// to easily support `std` and `no_std` workloads, and also re-exports
-// useful crates that should be common across the entire ecosystem, such as `rand`.
-use ark_std::{One, UniformRand};
-use crypto_tools::{Foldable2, Polynomial, PolynomialCoefficient};
-
+use stark_tools::{hashable::Hashable, Foldable2, Polynomial, PolynomialCoefficient};
 
 fn main() {
     let mut rng = ark_std::test_rng();
@@ -46,11 +36,25 @@ fn main() {
     //     vec![(one, BigInt([4, 0, 0, 0]))]);
     let second = F::get_root_of_unity(2).unwrap();
     println!("second root: {second}");
-    let p = PolynomialCoefficient::<Config, 4>::random_poly(&mut rng, 3);
+
+    use std::time::Instant;
+    let now = Instant::now();
+
+
+    let p = PolynomialCoefficient::<Config, 4>::random_poly(&mut rng, 7);
+    let elapsed = now.elapsed();
+    println!("Poly generated: {:.2?}", elapsed);
     println!("{p}");
-    let p2 = p.fft(1);
+    let p2 = p.fft(4);
+    let elapsed = now.elapsed();
+    println!("FFT: {:.2?}", elapsed);
     println!("FFT {p2}");
-    let f = p2.fold(1, F::ONE.double());
+    let f = p2.fold(4, F::ONE.double());
+    let elapsed = now.elapsed();
+    println!("Folded: {:.2?}", elapsed);
+    let commitment = f.commit(&mut rng);
+    let elapsed = now.elapsed();
+    println!("Commitment: {commitment}, {:.2?}", elapsed);
     println!("Folded {f}");
     // let poly: Polynomial<Config, 4> = Polynomial::random_poly_fft(&mut rng, 1<<20);
     // print!("{poly}");
