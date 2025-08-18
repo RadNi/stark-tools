@@ -1,8 +1,6 @@
-pub use crate::point::Point;
-pub use crate::polynomial::{Foldable2, Polynomial, PolynomialCoefficient, PolynomialPoints};
-
-mod point;
-mod polynomial;
-mod merkletree;
-mod common;
-pub mod hashable;
+pub mod point;
+pub mod polynomial;
+pub mod merkletree;
+pub mod commitable;
+pub mod spongefish_schnorr;
+pub mod test;

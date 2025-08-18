@@ -1,17 +1,16 @@
-use std::collections::HashSet;
-use std::{collections::HashMap, ops::Deref};
+use std::{collections::HashMap};
 use std::fmt::Debug;
 use std::vec;
 
-use ark_ff::{AdditiveGroup, BigInt, FftField, Field as Field, Fp, MontBackend, MontConfig, UniformRand};
+use ark_ff::{AdditiveGroup, BigInt, BigInteger, FftField, Field as Field, Fp, MontBackend, MontConfig, PrimeField, UniformRand};
 use ark_std::rand::Rng;
-use bimap::{BiHashMap, BiMap};
+use bimap::{BiHashMap};
+
+use crate::point::Point;
 
 type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
 
-use crate::{Point};
-
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PolynomialCoefficient<
 T, const N: usize
 > 
@@ -20,6 +19,17 @@ where T: MontConfig<N>
     pub degree: u64,
     // pub points: Option<Vec<Point<T, N>>>,
     pub coefficients: Vec<F<T, N>>
+}
+
+impl<T, const N: usize> Clone for PolynomialCoefficient<T, N>
+where T: MontConfig<N> {
+    fn clone(&self) -> Self {
+        let mut clonedCoefficients: Vec<F<T, N>> = vec![];
+        self.coefficients.iter().for_each(|c| clonedCoefficients.push(
+            F::new(c.into_bigint().clone())
+        ));
+        Self { degree: self.degree.clone(), coefficients: clonedCoefficients }
+    }
 }
 
 impl<T, const N:usize> std::fmt::Display for PolynomialCoefficient<T, N>
@@ -44,7 +54,7 @@ where T: MontConfig<N>
 {
     pub degree: u64,
     pub points: HashMap<F<T, N>, Box<Point<T, N>>>,
-    roots_preimage: Option<BiHashMap<F<T, N>, u64>>
+    pub roots_preimage: Option<BiHashMap<F<T, N>, u64>>
 }
 
 impl<'a, T, const N:usize> std::fmt::Display for PolynomialPoints<T, N>
@@ -120,7 +130,7 @@ where T: MontConfig<N>,
 
     fn fft(self, rate: u64) -> PolynomialPoints<T, N> {
         // TODO add error handling if the extended degree is less than degree
-        todo!()
+        self
     }
 
     fn ifft(self, rate: u64) -> PolynomialCoefficient<T, N> {
@@ -245,24 +255,27 @@ pub trait Foldable2<T, const N: usize>
 where Self: Sized, T: MontConfig<N>
 
 {
-    fn fold(&self, rate: u64, folding_number: F<T, N>) -> PolynomialPoints<T, N>;
+    fn fold(&self, folding_number: F<T, N>) -> PolynomialPoints<T, N>;
+    fn fold_bytes(&self, folding_number: [u64; N]) -> PolynomialPoints<T, N> {
+        self.fold(F::new(BigInt::<N>::new(folding_number)))
+    }
 }
 
 impl <T, const N: usize> Foldable2<T, N> for PolynomialPoints<T, N> 
 where T: MontConfig<N>
 {
-    fn fold(&self, rate: u64, folding_number: F<T, N>) -> PolynomialPoints<T, N> {
-        let extended_degree = (self.degree+1) * rate;
+    fn fold(&self, folding_number: F<T, N>) -> PolynomialPoints<T, N> {
+        let extended_degree = (self.degree+1);
         let omega: F<T, N> = F::get_root_of_unity(extended_degree).unwrap();
         let mut root = F::ONE;
 
         let mut points: HashMap<F<T, N>, Box<Point<T, N>>> = HashMap::new();
         let mut roots_preimage: BiHashMap<F<T, N>, u64> = BiHashMap::new();
-        let p_1 = self.points.get(&(-root)).unwrap();
+        // let p_1 = self.points.get(&(-root)).unwrap();
         for i in 0..extended_degree/2 {
-            roots_preimage.insert(root, i);
             assert_ne!(folding_number, root);
             let w2 = root * root;
+            roots_preimage.insert(w2, i);
             let value: F<T, N> = 
                 (self.points.get(&root).unwrap().get_y() * (root + folding_number)
                 + self.points.get(&(-root)).unwrap().get_y() * (root - folding_number)) / root.double();
