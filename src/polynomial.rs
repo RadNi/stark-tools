@@ -2,7 +2,7 @@ use std::{collections::HashMap};
 use std::fmt::Debug;
 use std::vec;
 
-use ark_ff::{AdditiveGroup, BigInt, BigInteger, FftField, Field as Field, Fp, MontBackend, MontConfig, PrimeField, UniformRand};
+use ark_ff::{AdditiveGroup, BigInt, FftField, Field as Field, Fp, MontBackend, MontConfig, PrimeField, UniformRand};
 use ark_std::rand::Rng;
 use bimap::{BiHashMap};
 
@@ -14,7 +14,7 @@ type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
 pub struct PolynomialCoefficient<
 T, const N: usize
 > 
-where T: MontConfig<N> 
+where T: MontConfig<N>
 {
     pub degree: u64,
     // pub points: Option<Vec<Point<T, N>>>,
@@ -33,7 +33,7 @@ where T: MontConfig<N> {
 }
 
 impl<T, const N:usize> std::fmt::Display for PolynomialCoefficient<T, N>
-where T: MontConfig<N> {
+where T: MontConfig<N>{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result  {
         let d = self.degree;
         write!(f, "Polynomial degree {d} with coefficients:\n")?;
@@ -48,13 +48,22 @@ where T: MontConfig<N> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PolynomialPoints<T, const N: usize> 
-where T: MontConfig<N> 
+where T: MontConfig<N>
 {
     pub degree: u64,
     pub points: HashMap<F<T, N>, Box<Point<T, N>>>,
     pub roots_preimage: Option<BiHashMap<F<T, N>, u64>>
+}
+
+impl<T, const N: usize> Clone for PolynomialPoints<T, N>
+where T: MontConfig<N> {
+    fn clone(&self) -> Self {
+        let mut points = HashMap::<F<T, N>, Box<Point<T, N>>>::new();
+        self.points.iter().for_each(|(k, v)| { points.insert(k.clone(), v.clone()); });
+        Self { degree: self.degree.clone(), points, roots_preimage: self.roots_preimage.clone() }
+    }
 }
 
 impl<'a, T, const N:usize> std::fmt::Display for PolynomialPoints<T, N>
@@ -73,7 +82,7 @@ where T: MontConfig<N> {
 }
 
 pub trait Polynomial<const N: usize, T, T1> 
-where T: MontConfig<N> {
+where T: MontConfig<N>, Self: Clone {
     fn zero(degree: u64) -> Self;
     fn new(degree: u64, raw: T1) -> Self;
     fn random_poly<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self;
@@ -256,8 +265,8 @@ where Self: Sized, T: MontConfig<N>
 
 {
     fn fold(&self, folding_number: F<T, N>) -> PolynomialPoints<T, N>;
-    fn fold_bytes(&self, folding_number: [u64; N]) -> PolynomialPoints<T, N> {
-        self.fold(F::new(BigInt::<N>::new(folding_number)))
+    fn fold_bigint(&self, folding_number: BigInt<N>) -> PolynomialPoints<T, N> {
+        self.fold(F::new(folding_number))
     }
 }
 

@@ -13,3 +13,15 @@ pub fn prove_leaf_index <T: MontConfig<N>, const N: usize>
     let path = commited_poly.ptree.generate_proof(index as usize);
     leaf_value.zip(path.ok())
 }
+
+pub fn bytes_to_bigints<const N1: usize, const N2: usize>(bytes: [u8; N1]) -> BigInt<N2> {
+    let mut res: [u64; N2] = [0; N2];
+    for i in 0..N2 {
+        let mut sum: u64 = 0;
+        for j in 0..8 {
+            sum += bytes[i * 8 + j] as u64;
+        }
+        res[i] = sum;
+    }
+    BigInt::new(res)
+}
