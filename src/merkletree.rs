@@ -1,5 +1,4 @@
 use pedersen::Parameters;
-use ark_crypto_primitives::Error as Error;
 use ark_crypto_primitives::crh::injective_map::PedersenTwoToOneCRHCompressor;
 use ark_crypto_primitives::crh::{
     injective_map::{PedersenCRHCompressor, TECompressor},
@@ -77,7 +76,6 @@ impl PedersenTreeConfig {
     }
     pub fn verify_path<T: MontConfig<N>, const N: usize>(&self, path: MerklePath, root: Root, leaf: F<T, N>) -> Result<bool, ark_crypto_primitives::Error> {
         let leaf_bytes = leaf.into_bigint().to_bytes_be();
-        // let leaf_bytes = [8, 0, 0, 0, 0, 0, 0, 16, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 249];
         path.verify(&self.leaf_crh_params, &self.two_to_one_crh_params, &root, leaf_bytes)
     }
 }

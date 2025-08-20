@@ -35,17 +35,17 @@ dependencies = [
 [[package]]
 name = "ark-bn254"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
- "ark-ec 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-ec 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-std 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "ark-crypto-primitives"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/crypto-primitives/?branch=main#39fb17bd6f46366913526c262454b9fce82a4cd7"
+source = "git+https://github.com/arkworks-rs/crypto-primitives/?rev=39fb17b#39fb17bd6f46366913526c262454b9fce82a4cd7"
 dependencies = [
  "ahash",
  "ark-crypto-primitives-macros",
@@ -69,7 +69,7 @@ dependencies = [
 [[package]]
 name = "ark-crypto-primitives-macros"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/crypto-primitives/?branch=main#39fb17bd6f46366913526c262454b9fce82a4cd7"
+source = "git+https://github.com/arkworks-rs/crypto-primitives/?rev=39fb17b#39fb17bd6f46366913526c262454b9fce82a4cd7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -111,12 +111,12 @@ dependencies = [
 [[package]]
 name = "ark-ec"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
  "ahash",
- "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-poly 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-serialize 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-poly 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-serialize 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-std 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "educe",
  "fnv",
@@ -164,11 +164,11 @@ dependencies = [
 [[package]]
 name = "ark-ff"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
- "ark-ff-asm 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-ff-macros 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-serialize 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-ff-asm 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-ff-macros 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-serialize 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-std 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "arrayvec",
  "digest",
@@ -192,7 +192,7 @@ dependencies = [
 [[package]]
 name = "ark-ff-asm"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
  "quote",
  "syn 2.0.104",
@@ -214,7 +214,7 @@ dependencies = [
 [[package]]
 name = "ark-ff-macros"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
  "num-bigint",
  "num-traits",
@@ -241,11 +241,11 @@ dependencies = [
 [[package]]
 name = "ark-poly"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
  "ahash",
- "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-serialize 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-serialize 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-std 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "educe",
  "fnv",
@@ -328,9 +328,9 @@ dependencies = [
 [[package]]
 name = "ark-serialize"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
- "ark-serialize-derive 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-serialize-derive 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-std 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "digest",
  "num-bigint",
@@ -350,7 +350,7 @@ dependencies = [
 [[package]]
 name = "ark-serialize-derive"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -371,11 +371,11 @@ dependencies = [
 [[package]]
 name = "ark-starkcurve"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/algebra/?branch=master#48ec86ef03f700244a5a24d38a751959ab64fd3e"
+source = "git+https://github.com/arkworks-rs/algebra/?rev=48ec86e#48ec86ef03f700244a5a24d38a751959ab64fd3e"
 dependencies = [
  "ark-bn254",
- "ark-ec 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
- "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-ec 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
+ "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-std 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -392,7 +392,7 @@ dependencies = [
 [[package]]
 name = "ark-std"
 version = "0.5.0"
-source = "git+https://github.com/arkworks-rs/std?branch=master#73dcad089f915f4b8126f67e91f78029ba76876e"
+source = "git+https://github.com/arkworks-rs/std?rev=73dcad0#73dcad089f915f4b8126f67e91f78029ba76876e"
 dependencies = [
  "num-traits",
  "rand 0.8.5",
@@ -857,7 +857,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 [[package]]
 name = "spongefish"
 version = "0.2.0"
-source = "git+https://github.com/arkworks-rs/spongefish/?branch=main#3ded547f7f56d7f8a1fc4c9a5c0ce965310bba5f"
+source = "git+https://github.com/arkworks-rs/spongefish/?rev=3ded547#3ded547f7f56d7f8a1fc4c9a5c0ce965310bba5f"
 dependencies = [
  "ark-ec 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ark-ff 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -880,9 +880,10 @@ dependencies = [
  "ark-curve25519",
  "ark-ec 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "ark-ed-on-bls12-381",
- "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?branch=master)",
+ "ark-ff 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ark-ff 0.5.0 (git+https://github.com/arkworks-rs/algebra/?rev=48ec86e)",
  "ark-starkcurve",
- "ark-std 0.5.0 (git+https://github.com/arkworks-rs/std?branch=master)",
+ "ark-std 0.5.0 (git+https://github.com/arkworks-rs/std?rev=73dcad0)",
  "bimap",
  "blake2",
  "hex",

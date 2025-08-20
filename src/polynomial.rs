@@ -16,6 +16,7 @@ T, const N: usize
 > 
 where T: MontConfig<N>
 {
+    // Fiat-Shamir assumes degree is two bytes
     pub degree: u64,
     // pub points: Option<Vec<Point<T, N>>>,
     pub coefficients: Vec<F<T, N>>
@@ -52,6 +53,7 @@ where T: MontConfig<N>{
 pub struct PolynomialPoints<T, const N: usize> 
 where T: MontConfig<N>
 {
+    // Fiat-Shamir assumes degree is two bytes
     pub degree: u64,
     pub points: HashMap<F<T, N>, Box<Point<T, N>>>,
     pub roots_preimage: Option<BiHashMap<F<T, N>, u64>>
@@ -264,17 +266,17 @@ pub trait Foldable2<T, const N: usize>
 where Self: Sized, T: MontConfig<N>
 
 {
-    fn fold(&self, folding_number: F<T, N>) -> PolynomialPoints<T, N>;
-    fn fold_bigint(&self, folding_number: BigInt<N>) -> PolynomialPoints<T, N> {
-        self.fold(F::new(folding_number))
+    fn fold(&self, rate: u64, folding_number: F<T, N>) -> PolynomialPoints<T, N>;
+    fn fold_bigint(&self, rate: u64, folding_number: BigInt<N>) -> PolynomialPoints<T, N> {
+        self.fold(rate, F::new(folding_number))
     }
 }
 
 impl <T, const N: usize> Foldable2<T, N> for PolynomialPoints<T, N> 
 where T: MontConfig<N>
 {
-    fn fold(&self, folding_number: F<T, N>) -> PolynomialPoints<T, N> {
-        let extended_degree = (self.degree+1);
+    fn fold(&self, rate: u64, folding_number: F<T, N>) -> PolynomialPoints<T, N> {
+        let extended_degree = (self.degree+1) * rate;
         let omega: F<T, N> = F::get_root_of_unity(extended_degree).unwrap();
         let mut root = F::ONE;
 

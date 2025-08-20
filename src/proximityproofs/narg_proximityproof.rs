@@ -1,4 +1,4 @@
-use ark_ff::{MontConfig};
+use ark_ff::{Fp, MontBackend, MontConfig};
 use ark_ec::{CurveGroup};
 use stark_tools::commitable::Commited;
 use crate::Polynomial;
@@ -26,6 +26,7 @@ pub trait ProximityProofProver<'b, H, G, P, const N: usize, T, T1> where
     ) -> ProofResult<&'b [u8]>;
 }
 pub trait ProximityProofVerifier<'b, H, G, Commitment> where
+    // T: MontConfig<N>,
     H: DuplexSpongeInterface,
     G: CurveGroup,
     for<'a> VerifierState<'a, H>: GroupToUnitDeserialize<G>
