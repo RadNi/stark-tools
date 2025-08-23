@@ -7,8 +7,8 @@ mod proximityproofs;
 
 fn main() {
     let mut rng = ark_std::test_rng();
-    // let modd = F::MODULUS;
-    // println!("modulus: {modd}");
+    let modd = F::MODULUS;
+    println!("modulus: {modd}");
 
     // let root64 = F::get_root_of_unity(2).unwrap();
     // let root32 = F::get_root_of_unity(4).unwrap();

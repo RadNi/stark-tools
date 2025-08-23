@@ -89,6 +89,7 @@ where T: MontConfig<N>, Self: Clone {
     fn new(degree: u64, raw: T1) -> Self;
     fn random_poly<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self;
     fn random_poly_smooth_subgroup<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self;
+    fn constant(rate: u64) -> Self;
     fn fft(self, rate: u64) -> PolynomialPoints<T, N>;
     fn ifft(self, rate: u64) -> PolynomialCoefficient<T, N>;
 }
@@ -111,6 +112,19 @@ where T: MontConfig<N>,
             roots_preimage: None
         }
     }
+
+    fn constant(rate: u64) -> Self {
+        todo!()
+    }
+
+    // fn constant(rate: u64) -> Self {
+    //     let omega = F::get_root_of_unity(rate).unwrap();
+    //     let root = F::ONE;
+    //     Self {
+    //         degree: 0,
+    //         roots_preimage: (0..rate).map(|_| {})
+    //     }
+    // }
 
 
     fn random_poly<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self {
@@ -256,6 +270,10 @@ where T: MontConfig<N>
             points: points,
             roots_preimage: Some(roots_preimage)
         }
+    }
+
+    fn constant(rate: u64) -> Self {
+        todo!()
     }
 
     fn ifft(self, extended_degree: u64) -> PolynomialCoefficient<T, N> {
