@@ -186,11 +186,11 @@ where T: MontConfig<N>
     fn random_poly<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self {
         let mut coefficients: Vec<F<T, N>> = vec![];
         for i in 0..(degree + 1) {
-            // coefficients.push(F::rand(rng));
+            coefficients.push(F::rand(rng));
             // let num: u64 = rand::random_range(0..20);
-            let mut v = [0; N];
-            v[0] = i*2+1;
-            coefficients.push(F::new(BigInt(v)));
+            // let mut v = [0; N];
+            // v[0] = i*2+1;
+            // coefficients.push(F::new(BigInt(v)));
             // coefficients.push(F::new(BigInt(v)));
         }
         Self {
