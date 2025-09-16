@@ -1,14 +1,25 @@
-use ark_ff::{AdditiveGroup, BigInt, FftField, Field, PrimeField};
-use ark_starkcurve::{Fq as F, FqConfig as Config};
-use stark_tools::{commitable::Commitable, merkletree::{PedersenTreeConfig}, polynomial::{Foldable2, Polynomial, PolynomialCoefficient}, spongefish_schnorr::spongefish_test, test::main_test};
+use ark_ff::{BigInt, PrimeField};
+use stark_tools::{fields::{Field192, Goldilocks}, merkletree::PedersenTreeConfig, polynomial::{Polynomial, PolynomialCoefficient}};
 
 use crate::proximityproofs::fri::fri_test;
+
 mod proximityproofs;
+// use stark_tools::{fields::Goldilocks, polynomial::{Polynomial, PolynomialCoefficient}};
+
+
+fn main2() {
+    let x = Goldilocks::from(10);
+    println!("{:#?}", x);
+    let mut rng = ark_std::test_rng();
+
+    let p: PolynomialCoefficient<Goldilocks> = PolynomialCoefficient::random_poly_smooth_subgroup(&mut rng, 7);
+
+    println!("{:#?} {}", p.coefficients[0], Goldilocks::MODULUS);
+}
+
 
 fn main() {
     let mut rng = ark_std::test_rng();
-    let modd = F::MODULUS;
-    println!("modulus: {modd}");
 
     // let root64 = F::get_root_of_unity(2).unwrap();
     // let root32 = F::get_root_of_unity(4).unwrap();

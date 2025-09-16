@@ -1,4 +1,4 @@
-use ark_ff::{Fp, MontBackend, MontConfig};
+use ark_ff::PrimeField;
 use ark_ec::{CurveGroup};
 use stark_tools::commitable::Commited;
 use crate::Polynomial;
@@ -9,11 +9,11 @@ use spongefish::codecs::arkworks_algebra::{
     GroupToUnitSerialize, ProofResult, ProverState, UnitToField, VerifierState
 };
 
-pub trait ProximityProofProver<'b, H, G, P, const N: usize, T, T1> where
-    T: MontConfig<N>,
+pub trait ProximityProofProver<'b, H, G, P, F, Raw> where
+    F: PrimeField,
     H: DuplexSpongeInterface,
     G: CurveGroup,
-    P: Polynomial<N, T, T1>,
+    P: Polynomial<F, Raw>,
     ProverState<H>: GroupToUnitSerialize<G> + UnitToField<G::ScalarField> {
     fn prove(
         &self,
@@ -33,7 +33,7 @@ pub trait ProximityProofVerifier<'b, H, G, Commitment> where
         + FieldToUnitDeserialize<G::ScalarField>
         + UnitToField<G::ScalarField> {
 
-    fn verify(
+    fn verify<F: PrimeField>(
         &self,
         verifier_state: &mut VerifierState<H>,
         // the commitment to the polynomial

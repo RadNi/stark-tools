@@ -1,40 +1,37 @@
 use std::{collections::HashMap};
 use std::fmt::Debug;
-use std::vec;
+use std::{vec};
 
-use ark_ff::{AdditiveGroup, BigInt, FftField, Field as Field, Fp, MontBackend, MontConfig, PrimeField, UniformRand};
+use ark_ff::{BigInt, BigInteger, PrimeField};
 use ark_std::rand::Rng;
 use bimap::{BiHashMap};
 
 use crate::point::Point;
 
-type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
+// type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
 
 #[derive(Debug)]
-pub struct PolynomialCoefficient<
-T, const N: usize
-> 
-where T: MontConfig<N>
+pub struct PolynomialCoefficient<F> where F: PrimeField
 {
     // Fiat-Shamir assumes degree is two bytes
     pub degree: u64,
     // pub points: Option<Vec<Point<T, N>>>,
-    pub coefficients: Vec<F<T, N>>
+    pub coefficients: Vec<F>
 }
 
-impl<T, const N: usize> Clone for PolynomialCoefficient<T, N>
-where T: MontConfig<N> {
+impl<F: PrimeField> Clone for PolynomialCoefficient<F>
+{
     fn clone(&self) -> Self {
-        let mut clonedCoefficients: Vec<F<T, N>> = vec![];
+        let mut clonedCoefficients: Vec<F> = vec![];
         self.coefficients.iter().for_each(|c| clonedCoefficients.push(
-            F::new(c.into_bigint().clone())
+                c.clone()
+            // F::new(c.into_bigint().clone())
         ));
         Self { degree: self.degree.clone(), coefficients: clonedCoefficients }
     }
 }
 
-impl<T, const N:usize> std::fmt::Display for PolynomialCoefficient<T, N>
-where T: MontConfig<N>{
+impl<F: PrimeField> std::fmt::Display for PolynomialCoefficient<F> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result  {
         let d = self.degree;
         write!(f, "Polynomial degree {d} with coefficients:\n")?;
@@ -50,26 +47,22 @@ where T: MontConfig<N>{
 }
 
 #[derive(Debug)]
-pub struct PolynomialPoints<T, const N: usize> 
-where T: MontConfig<N>
-{
+pub struct PolynomialPoints<F: PrimeField> {
     // Fiat-Shamir assumes degree is two bytes
     pub degree: u64,
-    pub points: HashMap<F<T, N>, Box<Point<T, N>>>,
-    pub roots_preimage: Option<BiHashMap<F<T, N>, u64>>
+    pub points: HashMap<F, Box<Point<F>>>,
+    pub roots_preimage: Option<BiHashMap<F, u64>>
 }
 
-impl<T, const N: usize> Clone for PolynomialPoints<T, N>
-where T: MontConfig<N> {
+impl<F: PrimeField> Clone for PolynomialPoints<F> {
     fn clone(&self) -> Self {
-        let mut points = HashMap::<F<T, N>, Box<Point<T, N>>>::new();
+        let mut points = HashMap::<F, Box<Point<F>>>::new();
         self.points.iter().for_each(|(k, v)| { points.insert(k.clone(), v.clone()); });
         Self { degree: self.degree.clone(), points, roots_preimage: self.roots_preimage.clone() }
     }
 }
 
-impl<'a, T, const N:usize> std::fmt::Display for PolynomialPoints<T, N>
-where T: MontConfig<N> {
+impl<'a, F: PrimeField> std::fmt::Display for PolynomialPoints<F> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result  {
         let d = self.degree;
         write!(f, "Polynomial degree {d} with points:\n")?;
@@ -83,19 +76,18 @@ where T: MontConfig<N> {
     }
 }
 
-pub trait Polynomial<const N: usize, T, T1> 
-where T: MontConfig<N>, Self: Clone {
+pub trait Polynomial<F: PrimeField, Raw> 
+where Self: Clone {
     fn zero(degree: u64) -> Self;
-    fn new(degree: u64, raw: T1) -> Self;
+    fn new(degree: u64, raw: Raw) -> Self;
     fn random_poly<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self;
     fn random_poly_smooth_subgroup<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self;
     fn constant(rate: u64) -> Self;
-    fn fft(self, rate: u64) -> PolynomialPoints<T, N>;
-    fn ifft(self, rate: u64) -> PolynomialCoefficient<T, N>;
+    fn fft(self, rate: u64) -> PolynomialPoints<F>;
+    fn ifft(self, rate: u64) -> PolynomialCoefficient<F>;
 }
 
-impl <'a, T, const N: usize> Polynomial<N, T, Vec<Point<T, N>>> for PolynomialPoints<T, N> 
-where T: MontConfig<N>,
+impl <'a, F: PrimeField> Polynomial<F, Vec<Point<F>>> for PolynomialPoints<F> 
 {
     fn zero(degree: u64) -> Self {
         Self {
@@ -105,7 +97,7 @@ where T: MontConfig<N>,
         }
     }
     
-    fn new(degree: u64, raw: Vec<Point<T, N>>) -> Self {
+    fn new(degree: u64, raw: Vec<Point<F>>) -> Self {
         Self {
             degree,
             points: raw.iter().map(|p| (p.get_x(), Box::new(p.clone()))).collect(),
@@ -143,28 +135,24 @@ where T: MontConfig<N>,
         let mut root = F::ONE;
         for i in 0..(degree + 1) {
             roots_preimage.insert(root, i);
-            let point: Point<T, N> = Point::new(
-                root,
-                F::rand(rng)
-            );
+            let point: Point<F> = Point::new_random(rng);
             points.insert(point.get_x(), Box::new(point));
             root = root * omega;
         }
         PolynomialPoints { degree, points, roots_preimage: Some(roots_preimage) }
     }
 
-    fn fft(self, rate: u64) -> PolynomialPoints<T, N> {
+    fn fft(self, rate: u64) -> PolynomialPoints<F> {
         // TODO add error handling if the extended degree is less than degree
         self
     }
 
-    fn ifft(self, rate: u64) -> PolynomialCoefficient<T, N> {
+    fn ifft(self, rate: u64) -> PolynomialCoefficient<F> {
         todo!()
     }
 }
 
-impl <T, const N: usize> Polynomial<N, T, Vec<F<T, N>>> for PolynomialCoefficient<T, N> 
-where T: MontConfig<N>
+impl <F: PrimeField> Polynomial<F, Vec<F>> for PolynomialCoefficient<F> 
   {
     fn zero(degree: u64) -> Self {
         Self {
@@ -173,7 +161,7 @@ where T: MontConfig<N>
         }
     }
 
-    fn new(degree: u64, raw: Vec<F<T, N>>) -> Self {
+    fn new(degree: u64, raw: Vec<F>) -> Self {
         assert!(raw.len() >= (degree + 1) as usize);
 
         Self {
@@ -184,7 +172,7 @@ where T: MontConfig<N>
 
 
     fn random_poly<R: Rng + ?Sized>(rng: &mut R, degree: u64) -> Self {
-        let mut coefficients: Vec<F<T, N>> = vec![];
+        let mut coefficients: Vec<F> = vec![];
         for i in 0..(degree + 1) {
             coefficients.push(F::rand(rng));
             // let num: u64 = rand::random_range(0..20);
@@ -202,9 +190,9 @@ where T: MontConfig<N>
         Self::random_poly(rng, degree)
     }
 
-    fn fft(self, rate: u64) -> PolynomialPoints<T, N> {
+    fn fft(self, rate: u64) -> PolynomialPoints<F> {
         let extended_degree = (self.degree + 1) * rate;
-        let omega: F<T, N> = F::get_root_of_unity(extended_degree as u64).unwrap();
+        let omega: F = F::get_root_of_unity(extended_degree as u64).unwrap();
         let mut root = F::ONE;
         if self.degree == 0 {
             let value = self.coefficients.get(0).unwrap();
@@ -225,16 +213,16 @@ where T: MontConfig<N>
                 roots_preimage: Some(roots_preimage)
             }
         }
-        let p_e: PolynomialPoints<T, N> = PolynomialCoefficient { 
+        let p_e: PolynomialPoints<F> = PolynomialCoefficient { 
             degree: self.degree/2, 
             coefficients: self.coefficients.iter().step_by(2).cloned().collect()
         }.fft(rate);
-        let p_o: PolynomialPoints<T, N> = PolynomialCoefficient { 
+        let p_o: PolynomialPoints<F> = PolynomialCoefficient { 
             degree: self.degree/2, 
             coefficients: self.coefficients.iter().skip(1).step_by(2).cloned().collect()
         }.fft(rate);
 
-        let mut points: HashMap<Fp<MontBackend<T, N>, N>, Box<Point<T, N>>> = HashMap::new();
+        let mut points: HashMap<F, Box<Point<F>>> = HashMap::new();
         let mut roots_preimage = BiHashMap::new();
         // let mut roots: Vec<F<T, N>> = vec![F::ONE];
         for i in 0..extended_degree {
@@ -242,7 +230,7 @@ where T: MontConfig<N>
             root = root * omega;
 
             let j = if i >= extended_degree/2 { i - extended_degree/2 } else { i };
-            let w = roots_preimage.get_by_right(&j).unwrap();
+            let w = *roots_preimage.get_by_right(&j).unwrap();
             let w2 = w*w;
             let y_e_j = p_e.points.get(&w2).unwrap().get_y();
             let y_o_j = p_o.points.get(&w2).unwrap().get_y();
@@ -276,36 +264,35 @@ where T: MontConfig<N>
         todo!()
     }
 
-    fn ifft(self, extended_degree: u64) -> PolynomialCoefficient<T, N> {
+    fn ifft(self, extended_degree: u64) -> PolynomialCoefficient<F> {
         todo!()
     }
 }
-pub trait Foldable2<T, const N: usize>
-where Self: Sized, T: MontConfig<N>
+pub trait Foldable2<F: PrimeField, const N: usize>
+where Self: Sized
 
 {
-    fn fold(&self, rate: u64, folding_number: F<T, N>) -> PolynomialPoints<T, N>;
-    fn fold_bigint(&self, rate: u64, folding_number: BigInt<N>) -> PolynomialPoints<T, N> {
-        self.fold(rate, F::new(folding_number))
+    fn fold(&self, rate: u64, folding_number: F) -> PolynomialPoints<F>;
+    fn fold_bigint(&self, rate: u64, folding_number: BigInt<N>) -> PolynomialPoints<F> {
+        self.fold(rate, F::from_be_bytes_mod_order(&folding_number.to_bytes_be()))
     }
 }
 
-impl <T, const N: usize> Foldable2<T, N> for PolynomialPoints<T, N> 
-where T: MontConfig<N>
+impl <const N: usize, F: PrimeField> Foldable2<F, N> for PolynomialPoints<F> 
 {
-    fn fold(&self, rate: u64, folding_number: F<T, N>) -> PolynomialPoints<T, N> {
+    fn fold(&self, rate: u64, folding_number: F) -> PolynomialPoints<F> {
         let extended_degree = (self.degree+1) * rate;
-        let omega: F<T, N> = F::get_root_of_unity(extended_degree).unwrap();
+        let omega = F::get_root_of_unity(extended_degree).unwrap();
         let mut root = F::ONE;
 
-        let mut points: HashMap<F<T, N>, Box<Point<T, N>>> = HashMap::new();
-        let mut roots_preimage: BiHashMap<F<T, N>, u64> = BiHashMap::new();
+        let mut points: HashMap<F, Box<Point<F>>> = HashMap::new();
+        let mut roots_preimage: BiHashMap<F, u64> = BiHashMap::new();
         // let p_1 = self.points.get(&(-root)).unwrap();
         for i in 0..extended_degree/2 {
             assert_ne!(folding_number, root);
             let w2 = root * root;
             roots_preimage.insert(w2, i);
-            let value: F<T, N> = 
+            let value = 
                 (self.points.get(&root).unwrap().get_y() * (root + folding_number)
                 + self.points.get(&(-root)).unwrap().get_y() * (root - folding_number)) / root.double();
             points.insert(w2, Box::new(Point::new(w2, value)));

@@ -1,9 +1,6 @@
 use ark_crypto_primitives::{merkle_tree::Path, sponge::Absorb};
-use ark_ff::{BigInt, Fp, MontBackend, MontConfig};
+use ark_ff::{BigInt, PrimeField};
 use stark_tools::{commitable::Commited, merkletree::MerkleConfig, polynomial::PolynomialPoints};
-use ark_ff_canonical::{BigInt as BigIntCanonical, Fp as FpCanonical, MontBackend as MontBackendCanonical, MontConfig as MontConfigCanonical};
-
-type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
 
 pub fn path_to_bytes(path: Path<MerkleConfig>) -> Result<Vec<[u8; 32]>, String> {
     // println!("path to bytes: {:?}", path);
@@ -29,8 +26,8 @@ pub fn bytes_to_path(proof: Vec<[u8; 32]>, query_index: usize) -> Result<Path<Me
         })
 }
 
-pub fn prove_leaf_index <T: MontConfig<N>, const N: usize> (
-    commited_poly: &Commited<PolynomialPoints<T, N>>, index: u64) -> Result<(F<T, N>, Path<MerkleConfig>), String> {
+pub fn prove_leaf_index <F: PrimeField> (
+    commited_poly: &Commited<PolynomialPoints<F>>, index: u64) -> Result<(F, Path<MerkleConfig>), String> {
     let roots = commited_poly.data.roots_preimage.as_ref().ok_or_else(|| format!("roots_preimage is None!"))?;
     let queried_x = roots.get_by_right(&index).ok_or_else(|| format!("could not find index {index}"))?;
     let leaf_value = commited_poly.data.points.get(queried_x).and_then(|y| Some(y.get_y())).ok_or_else(|| format!("could not find leaf_value for index {index}"))?;
@@ -38,21 +35,25 @@ pub fn prove_leaf_index <T: MontConfig<N>, const N: usize> (
     Ok((leaf_value, path))
 }
 
-pub fn bytes_to_bigints<const N1: usize, const N2: usize>(bytes: [u8; N1]) -> BigInt<N2> {
-    let mut res: [u64; N2] = [0; N2];
-    for i in 0..N2 {
+
+pub fn bytes_to_bigints<const N: usize>(bytes: Vec<u8>) -> BigInt<N> {
+    assert_eq!(bytes.len() / 8, N);
+    let mut res = [0u64; N];
+    for i in 0..N {
         let mut sum: u64 = 0;
         for j in 0..8 {
-            sum *= 256;
-            sum += bytes[i * 8 + j] as u64;
+            sum = (sum << 8) | (bytes[i * 8 + j] as u64);
         }
         res[i] = sum;
     }
     res.reverse();
+
     BigInt::new(res)
 }
 
-pub fn bytes_to_bigints_canonical<const N1: usize, const N2: usize>(bytes: [u8; N1]) -> BigIntCanonical<N2> {
+
+
+pub fn bytes_to_bigints_canonical<const N1: usize, const N2: usize>(bytes: [u8; N1]) -> BigInt<N2> {
     let mut res: [u64; N2] = [0; N2];
     for i in 0..N2 {
         let mut sum: u64 = 0;
@@ -64,7 +65,7 @@ pub fn bytes_to_bigints_canonical<const N1: usize, const N2: usize>(bytes: [u8; 
     }
     // println!("input: {:?} output: {:?}", bytes, res);
     res.reverse();
-    BigIntCanonical::new(res)
+    BigInt::new(res)
 }
 
 pub fn bytes_to_bls(bytes: [u8; 32]) -> ark_ed_on_bls12_381::Fq {

@@ -1,9 +1,4 @@
-use ark_ed_on_bls12_381::{EdwardsProjective};
-
-use ark_ff::{BigInteger, Fp, MontBackend, MontConfig, PrimeField};
-use ark_std::rand::Rng;
-
-type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
+use ark_ff::PrimeField;
 
 use crate::{merkletree::{new_pedersen_merkletree, PedersenMerkleTree, PedersenTreeConfig}, point::Point, polynomial::PolynomialPoints};
 
@@ -21,17 +16,16 @@ impl<T> Commited<T> {
     }
 }
 
-pub trait Commitable<T, const N: usize>
-where Self: Sized, T: MontConfig<N> {
+pub trait Commitable<F: PrimeField>
+where Self: Sized {
     fn commit(self, pedersen_config: &PedersenTreeConfig) -> Commited<Self>;
 }
 
-impl <T, const N: usize> Commitable<T, N> for PolynomialPoints<T, N> 
-where T: MontConfig<N> {
+impl <F: PrimeField> Commitable<F> for PolynomialPoints<F> {
     fn commit(self, pedersen_config: &PedersenTreeConfig) -> Commited<Self> {
         // let leaf_hash_param = sha256::Sha256::T1::setup(rng);
         let mut points_vectorized = self.points.clone()
-            .into_iter().collect::<Vec<(F<T, N>, Box<Point<T, N>>)>>();
+            .into_iter().collect::<Vec<(F, Box<Point<F>>)>>();
         let roots = &self.roots_preimage;
         // println!("{:?}", roots);
         points_vectorized.sort_by(|p1, p2| 
@@ -44,7 +38,7 @@ where T: MontConfig<N> {
                 .get_by_left(&p2.0)
             )
         );
-        let list = points_vectorized.iter().map(|p| p.1.get_y()).collect::<Vec<F< T, N>>>();
+        let list = points_vectorized.iter().map(|p| p.1.get_y()).collect::<Vec<F>>();
         // println!("listt: {:?}", list.iter()
             // .map(|x| x.into_bigint().to_bytes_be()).collect::<Vec<Vec<u8>>>()
         // );

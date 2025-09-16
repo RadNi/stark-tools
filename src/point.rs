@@ -1,33 +1,30 @@
 use std::fmt::Debug;
-use ark_ff::{Fp, MontBackend, MontConfig, UniformRand};
+use ark_ff::PrimeField;
 use ark_std::rand::Rng;
-
-type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
 
 #[derive(Debug)]
 pub struct Point
-<T, const N: usize> 
-where T: MontConfig<N> 
+<F: PrimeField>
 {
-    x: F<T, N>,
-    y: F<T, N>,
+    x: F,
+    y: F,
 }
 
-impl<T, const N: usize> Clone for Point<T, N> where T: MontConfig<N> {
+impl<F: PrimeField> Clone for Point<F> {
     fn clone(&self) -> Self {
         Self { x: self.x.clone(), y: self.y.clone() }
     }
 }
 
-impl<T, const N: usize> Point<T, N> where T: MontConfig<N> {
-    pub fn get_x(&self) -> F<T, N> {
+impl<F: PrimeField> Point<F> {
+    pub fn get_x(&self) -> F {
         self.x
     }
-    pub fn get_y(&self) -> F<T, N> {
+    pub fn get_y(&self) -> F {
         
         self.y
     }
-    pub const fn new(x: F<T, N>, y: F<T, N>) -> Self {
+    pub const fn new(x: F, y: F) -> Self {
         Point {
             x,
             y
@@ -35,14 +32,13 @@ impl<T, const N: usize> Point<T, N> where T: MontConfig<N> {
     }
 
     pub fn new_random<R: Rng + ?Sized>(rng: &mut R) -> Self {
-        let x: F<T, N> = F::rand(rng);
-        let y: F<T, N> = F::rand(rng);
+        let x: F = F::rand(rng);
+        let y: F = F::rand(rng);
         Self { x: x, y: y }
     }
 }
 
-impl<T, const N:usize> std::fmt::Display for Point<T, N>
-where T: MontConfig<N> {
+impl<F: PrimeField> std::fmt::Display for Point<F>{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({}, {})", self.x, self.y)
     }

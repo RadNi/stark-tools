@@ -12,8 +12,7 @@ use ark_crypto_primitives::crh::{
 };
 use ark_crypto_primitives::merkle_tree::{ByteDigestConverter, Config, MerkleTree, Path};
 use ark_std::rand::Rng;
-use ark_ff::{BigInteger, Fp, MontBackend, MontConfig, PrimeField};
-type F<T, const N:usize> = Fp<MontBackend<T, N>, N>;
+use ark_ff::{BigInteger, PrimeField};
 
 
 pub type TwoToOneHash = 
@@ -74,7 +73,7 @@ impl PedersenTreeConfig {
             two_to_one_crh_params: two_to_one_crh_params,
         }
     }
-    pub fn verify_path<T: MontConfig<N>, const N: usize>(&self, path: MerklePath, root: Root, leaf: F<T, N>) -> Result<bool, ark_crypto_primitives::Error> {
+    pub fn verify_path<F: PrimeField>(&self, path: MerklePath, root: Root, leaf: F) -> Result<bool, ark_crypto_primitives::Error> {
         let leaf_bytes = leaf.into_bigint().to_bytes_be();
         path.verify(&self.leaf_crh_params, &self.two_to_one_crh_params, &root, leaf_bytes)
     }
@@ -88,7 +87,7 @@ pub type MerklePath = Path<MerkleConfig>;
 pub type PedersenMerkleTree = MerkleTree<MerkleConfig>;
 
 
-pub fn new_pedersen_merkletree<T: MontConfig<N>, const N: usize>(pedersen_config: &PedersenTreeConfig, leaves: Vec<F<T, N>>) -> PedersenMerkleTree {
+pub fn new_pedersen_merkletree<F: PrimeField>(pedersen_config: &PedersenTreeConfig, leaves: Vec<F>) -> PedersenMerkleTree {
     let mut leaves_bytes: Vec<Vec<u8>> = vec![];
     leaves
         .iter()
